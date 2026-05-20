@@ -4,7 +4,7 @@
 LOG_FILE=~/hdd_health.log
 
 # Gmailの設定
-EMAIL="hikaru.qw731@gmail.com"  # 送信先メールアドレス
+EMAIL="@gmail.com"  # 送信先メールアドレス
 SUBJECT="HDD 健康チェックの結果"
 MESSAGE="HDD 健康チェックの結果をお送りいたします。"
 
