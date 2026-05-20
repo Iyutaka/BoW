@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>体重記録</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 420px;
+            margin: auto;
+            padding: 20px;
+            background: #f3f4f6
+        }
+
+        .card {
+            background: #fff;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 16px
+        }
+
+        h2 {
+            text-align: center
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0
+        }
+
+        button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 20px
+        }
+
+        input {
+            width: 100px;
+            font-size: 20px;
+            text-align: center
+        }
+
+        .save {
+            width: 100%;
+            height: 50px;
+            font-size: 18px
+        }
+
+        .history {
+            font-size: 14px
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h2>ORDER65 体重記録</h2>
+        <div id="today"></div>
+
+        <div class="row">
+            <label>Weight</label>
+            <div>
+                <button onclick="change('weight',-0.1)">-</button>
+                <input id="weight" type="number" step="0.1">
+                <button onclick="change('weight',0.1)">+</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <label>Fat</label>
+            <div>
+                <button onclick="change('fat',-0.1)">-</button>
+                <input id="fat" type="number" step="0.1">
+                <button onclick="change('fat',0.1)">+</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <label>Waist</label>
+            <div>
+                <button onclick="change('waist',-1)">-</button>
+                <input id="waist" type="number">
+                <button onclick="change('waist',1)">+</button>
+            </div>
+        </div>
+
+        <button class="save" onclick="save()">保存</button>
+    </div>
+
+    <div class="card history">
+        <h3>履歴</h3>
+        <div id="history"></div>
+    </div>
+
+    <script>
+        const today = new Date().toISOString().slice(0, 10)
+        document.getElementById('today').innerText = today
+
+        let data = JSON.parse(localStorage.getItem('weights') || '[]')
+
+        if (data.length) {
+            let last = data[data.length - 1]
+            weight.value = last.weight
+            fat.value = last.fat
+            waist.value = last.waist
+        }
+
+        function change(id, val) {
+            let e = document.getElementById(id)
+            e.value = (parseFloat(e.value || 0) + val).toFixed(1)
+        }
+
+        function save() {
+            let record = {
+                date: today,
+                weight: Number(weight.value),
+                fat: Number(fat.value),
+                waist: Number(waist.value)
+            }
+
+            data = data.filter(v => v.date !== today)
+            data.push(record)
+            localStorage.setItem('weights', JSON.stringify(data))
+            render()
+            alert('保存しました')
+        }
+
+        function render() {
+            history.innerHTML = data.slice().reverse().map(v =>
+                `${v.date} ${v.weight}kg / ${v.fat}% / ${v.waist}cm`
+            ).join('<br>')
+        }
+        render()
+    </script>
+</body>
+
+</html>
