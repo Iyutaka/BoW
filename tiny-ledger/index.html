@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>TinyLedger</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 430px;
+            margin: auto;
+            padding: 15px;
+            background: #f3f4f6
+        }
+
+        .card {
+            background: #fff;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08)
+        }
+
+        h1 {
+            text-align: center;
+            margin: 5px 0
+        }
+
+        .small {
+            text-align: center;
+            color: #666;
+            font-size: 13px
+        }
+
+        .balance {
+            text-align: center;
+            font-size: 34px;
+            font-weight: bold;
+            margin: 10px 0
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px
+        }
+
+        button {
+            height: 55px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px
+        }
+
+        .memo {
+            width: 100%;
+            height: 45px;
+            font-size: 16px;
+            padding: 8px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            border: 1px solid #ccc
+        }
+
+        .save {
+            width: 100%;
+            margin-top: 10px
+        }
+
+        .history {
+            font-size: 14px;
+            line-height: 1.7
+        }
+
+        .temp {
+            text-align: center;
+            font-size: 22px;
+            margin: 15px 0
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h1>TinyLedger</h1>
+        <div class="small">Cash only tracker</div>
+
+        <div class="balance" id="balance">0円</div>
+        <div class="temp">今回: <span id="current">0</span>円</div>
+
+        <div class="grid">
+            <button onclick="add(10000)">+10000</button>
+            <button onclick="add(5000)">+5000</button>
+            <button onclick="add(1000)">+1000</button>
+
+            <button onclick="add(500)">+500</button>
+            <button onclick="add(100)">+100</button>
+            <button onclick="add(50)">+50</button>
+
+            <button onclick="add(10)">+10</button>
+            <button onclick="add(5)">+5</button>
+            <button onclick="add(1)">+1</button>
+
+            <button onclick="add(-1000)">-1000</button>
+            <button onclick="add(-500)">-500</button>
+            <button onclick="add(-100)">-100</button>
+        </div>
+
+        <input class="memo" id="memo" placeholder="メモ（自販機、昼食など）">
+        <button class="save" onclick="save()">保存</button>
+    </div>
+
+    <div class="card history">
+        <h3>履歴</h3>
+        <div id="history"></div>
+    </div>
+
+    <script>
+        let data = JSON.parse(localStorage.getItem('tinyLedger') || '[]')
+        let amount = 0
+
+        function add(v) {
+            amount += v
+            current.innerText = amount
+        }
+
+        function calcBalance() {
+            let total = data.reduce((a, b) => a + b.amount, 0)
+            balance.innerText = total.toLocaleString() + "円"
+        }
+
+        function save() {
+            if (amount === 0) {
+                alert('金額が0です')
+                return
+            }
+
+            let now = new Date()
+            let date = now.toLocaleString('ja-JP')
+
+            data.push({
+                date,
+                amount,
+                memo: memo.value || '-'
+            })
+
+            localStorage.setItem(
+                'tinyLedger',
+                JSON.stringify(data)
+            )
+
+            amount = 0
+            current.innerText = 0
+            memo.value = ''
+
+            render()
+            calcBalance()
+
+            alert('保存しました')
+        }
+
+        function render() {
+            history.innerHTML = data.slice().reverse().map(v => `
+ ${v.date}<br>
+ ${v.amount > 0 ? '+' : ''}${v.amount}円 ${v.memo}<hr>
+ `).join('')
+        }
+
+        render()
+        calcBalance()
+    </script>
+
+</body>
+
+</html>
